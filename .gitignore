@@ -1,0 +1,6 @@
+db/
+chain/
+.env
+./types/augment/all/defs.json
+storage/
+distributor/
