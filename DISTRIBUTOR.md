@@ -7,6 +7,7 @@
 ```sh
 mkdir -p ./distributor/config
 mkdir -p ./distributor/keystore
+mkdir -p ./distributor/scratch
 ```
 - Copy `distributor.example.config.yml` and rename it `config.yml`, place into folder location specified in compose file that maps to `/config` volume. If you haven't changed volumes then it would go in `./distributor/config/config.yml`
 - Copy your distributor role key to the keystore as `./distributor/keystore/distributor-role-key.json`, or set a `suri` or `mnemonic` key in the keys list of the `config.yml` file.
