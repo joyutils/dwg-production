@@ -1,0 +1,18 @@
+# Caddy
+version: '3.4'
+services:
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - 80:80  # Needed for the ACME HTTP-01 challenge.
+      - 443:443
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/config:/config
+      - ./caddy/data:/data
+    environment:
+      DOMAIN: https://your.hostname.here
+      EMAIL: your@email.here
+      LOG_FILE: /data/access.log

@@ -1,0 +1,15 @@
+{$DOMAIN}/distributor/* {
+    uri strip_prefix /distributor
+    reverse_proxy distributor:3334
+    log {
+       output stdout
+    }
+}
+
+{$DOMAIN}/storage/* {
+    uri strip_prefix /storage
+    reverse_proxy colossus:3333
+    log {
+       output stdout
+    }
+}
