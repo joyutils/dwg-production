@@ -36,30 +36,36 @@ Examples:
 Notice we use the docker service name to reach the endpoint:
 
 ```sh
-docker compose -f ./distributor.compose.yml run --rm distributor node:stop-public-api --url http://distributor:3335/
+docker compose -f ./distributor.compose.yml run --rm distributor \
+  node:stop-public-api --url http://distributor:3335/
 ```
 
 ```sh
-docker compose -f ./distributor.compose.yml run --rm distributor node:start-public-api --url http://distributor:3335/
+docker compose -f ./distributor.compose.yml run --rm distributor \
+  node:start-public-api --url http://distributor:3335/
 ```
 
 ### Accepting invitation
 
 ```sh
-docker compose -f ./distributor.compose.yml run --rm distributor operator:accept-invitation -B 1:4 -w 3
+docker compose -f ./distributor.compose.yml run --rm distributor \
+  operator:accept-invitation -B 1:4 -w 3
 ```
 
 #### Setting operator metadata
-Say you have the metadata file in your home directory.
-`~/metadata.json` to the scratch volume path
+Say you have the metadata file in your home directory `~/metadata.json`.
+copy it to the scratch volume path
 
 ```sh
 cp ~/metadata.json ./distributor/scratch/metadata.json
-docker compose -f ./distributor.compose.yml run --rm distributor operator:set-metadata -B 0:1 -w 13 --input /scratch/metadata.json
+docker compose -f ./distributor.compose.yml run --rm distributor \
+  operator:set-metadata -B 0:1 -w 13 --input /scratch/metadata.json
 ```
 
 Or you can mount the file directly.
 
 ```sh
-docker compose -f ./distributor.compose.yml run --rm -v ~/metadata.json:/metadata.json distributor operator:set-metadata -B 0:1 -w 13 --input /metadata.json
+docker compose -f ./distributor.compose.yml run --rm \
+  -v ~/metadata.json:/metadata.json \
+  distributor operator:set-metadata -B 0:1 -w 13 --input /metadata.json
 ```
