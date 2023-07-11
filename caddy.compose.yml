@@ -13,6 +13,6 @@ services:
       - ./caddy/config:/config
       - ./caddy/data:/data
     environment:
-      DOMAIN: https://your.hostname.here
-      EMAIL: your@email.here
+      DOMAIN: ${CADDY_DOMAIN}
+      EMAIL: ${CADDY_EMAIL}
       LOG_FILE: /data/access.log

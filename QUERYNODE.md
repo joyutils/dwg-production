@@ -6,6 +6,7 @@ Use this setup to run with no dependencies on any external services.
 ```sh
 git clone https://github.com/mnaamani/storage-production && cd storage-production/
 cp env.example .env
+# edit .env file to customise database volume, username, password and chain database paths.
 
 # Start all services
 docker compose up -d
