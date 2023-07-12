@@ -25,9 +25,14 @@ A working graphql endpoint should be accessible at http://localhost:8081/graphql
 
 You should wait for nodes to fully sync up before using it in production.
 
-Both services only listen on localhost as they are intended to be used publicly and reserved for the storage/distributors running on the same host.
+Both services only listen on localhost as they are not intended to be used publicly and reserved for the storage/distributors running on the same host.
 
 For more options configuring the [QueryNode](QUERYNODE.md)
+
+A basic open telemetry collector and dashboard is also up and running.
+Access the [Jaeger](https://www.jaegertracing.io/) telemetry dashboard at http://localhost:16686
+
+Currently only the caddy service is configued to send trace logs to the local collector.
 
 ### Distributor Node
 If you want to run a Distributor node check the following [instructions](DISTRIBUTOR.md)
@@ -36,11 +41,4 @@ If you want to run a Distributor node check the following [instructions](DISTRIB
 If you want to run a Storage node check the following [instructions](STORAGE.md)
 
 ### Caddy
-Once you have setup your storage or distributor nodes, you will need to make them acessible with a reverse proxy such as nginx or caddy. A caddy service is already prepared for you.
-All you need to do is update your `CADDY_DOMAIN` and `CADDY_EMAIL` in `.env` then start it up:
-
-```sh
-docker compose -f ./caddy.compose.yml up -d caddy
-```
-
-The `caddy/Caddyfile` only exposes storage and distributor nodes.
+Once you have setup your storage or distributor nodes, you will need to make them acessible with a reverse proxy such as nginx or caddy. check followinf [instructions](caddy/README.md).
