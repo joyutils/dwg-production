@@ -36,11 +36,4 @@ If you want to run a Distributor node check the following [instructions](DISTRIB
 If you want to run a Storage node check the following [instructions](STORAGE.md)
 
 ### Caddy
-Once you have setup your storage or distributor nodes, you will need to make them acessible with a reverse proxy such as nginx or caddy. A caddy service is already prepared for you.
-All you need to do is update your `CADDY_DOMAIN` and `CADDY_EMAIL` in `.env` then start it up:
-
-```sh
-docker compose -f ./caddy.compose.yml up -d caddy
-```
-
-The `caddy/Caddyfile` only exposes storage and distributor nodes.
+Once you have setup your storage or distributor nodes, you will need to make them acessible with a reverse proxy such as nginx or caddy. check followinf [instructions](caddy/README.md).

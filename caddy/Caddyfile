@@ -2,14 +2,21 @@
     uri strip_prefix /distributor
     reverse_proxy distributor:3334
     log {
-       output stdout
+       output stderr
     }
+    tracing {
+		span distributor_caddy
+	}
+
 }
 
 {$DOMAIN}/storage/* {
     uri strip_prefix /storage
     reverse_proxy colossus:3333
     log {
-       output stdout
+       output stderr
     }
+    tracing {
+		span storage_caddy
+	}
 }
