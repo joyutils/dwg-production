@@ -151,3 +151,16 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:6379:6379"
+
+# Open Telemetry Services
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - '16686:16686'
+  collector:
+    container_name: collector
+    image: otel/opentelemetry-collector:latest
+    command: ['--config=/etc/otel-collector-config.yaml']
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml

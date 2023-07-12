@@ -25,9 +25,14 @@ A working graphql endpoint should be accessible at http://localhost:8081/graphql
 
 You should wait for nodes to fully sync up before using it in production.
 
-Both services only listen on localhost as they are intended to be used publicly and reserved for the storage/distributors running on the same host.
+Both services only listen on localhost as they are not intended to be used publicly and reserved for the storage/distributors running on the same host.
 
 For more options configuring the [QueryNode](QUERYNODE.md)
+
+A basic open telemetry collector and dashboard is also up and running.
+Access the [Jaeger](https://www.jaegertracing.io/) telemetry dashboard at http://localhost:16686
+
+Currently only the caddy service is configued to send trace logs to the local collector.
 
 ### Distributor Node
 If you want to run a Distributor node check the following [instructions](DISTRIBUTOR.md)

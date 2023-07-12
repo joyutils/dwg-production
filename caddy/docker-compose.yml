@@ -16,16 +16,6 @@ services:
       DOMAIN: ${CADDY_DOMAIN}
       EMAIL: ${CADDY_EMAIL}
       LOG_FILE: /data/access.log
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://collector:4318/
-      # OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://collector:4317/
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
       OTEL_SERVICE_NAME: caddy
-
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    ports:
-      - '16686:16686'
-  collector:
-    image: otel/opentelemetry-collector:latest
-    command: ['--config=/etc/otel-collector-config.yaml']
-    volumes:
-      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
