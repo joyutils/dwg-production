@@ -4,3 +4,4 @@ chain/
 ./types/augment/all/defs.json
 storage/
 distributor/
+badger/

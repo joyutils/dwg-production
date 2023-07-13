@@ -3,13 +3,26 @@ receivers:
     protocols:
       grpc:
       http:
+  # hostmetrics:
+  #  https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/hostmetricsreceiver
+  #  https://grafana.com/grafana/dashboards/18682-otel-node/
+
 exporters:
   jaeger:
     endpoint: jaeger:14250
     tls:
       insecure: true
+  # Export to shared ElasticSearch cluster
+  # otlphttp:
+  #     compression: none
+  #     endpoint: ${ELASTIC_APM_URL}
+  #     tls:
+  #       insecure: true
+  #     headers:
+  #       Authorization: Bearer ${ELASTIC_APM_SERVER_TOKEN}
 service:
   pipelines:
     traces:
       receivers: [otlp]
       exporters: [jaeger]
+      # exporters: [jaeger, otlphttp]

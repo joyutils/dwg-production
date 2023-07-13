@@ -153,9 +153,18 @@ services:
       - "127.0.0.1:6379:6379"
 
 # Open Telemetry Services
+# Use badger local storage
+# https://www.jaegertracing.io/docs/1.47/deployment/#badger---local-storage
   jaeger:
     container_name: jaeger
     image: jaegertracing/all-in-one:latest
+    volumes:
+      - ./badger:/badger
+    environment:
+      - SPAN_STORAGE_TYPE=badger
+      - BADGER_EPHEMERAL=false
+      - BADGER_DIRECTORY_VALUE=/badger/data
+      - BADGER_DIRECTORY_KEY=/badger/key
     ports:
       - '16686:16686'
   collector:
