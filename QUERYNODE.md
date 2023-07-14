@@ -32,6 +32,7 @@ cp env.example .env
 # PROCESSOR_INDEXER_GATEWAY=https://mainnet-rpc-1.joystream.org/query-node/indexer/graphql
 
 # Bring up requried services only
+docker compose up -d processor
 docker compose up -d graphql-server
 ```
 

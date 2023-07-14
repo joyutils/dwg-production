@@ -11,7 +11,7 @@
 
 {$DOMAIN}/storage/* {
   uri strip_prefix /storage
-  reverse_proxy colossus:3333
+  reverse_proxy storage:3333
   log {
     output stderr
   }

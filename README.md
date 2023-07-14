@@ -4,7 +4,8 @@ All you need to run a storage or distributor node for Joystream mainnet, on a si
 
 ### Requirements
 
-Docker
+[Docker](https://docs.docker.com/get-docker/)
+[Docker Compose](https://docs.docker.com/compose/install/#install-compose) v2.0.0+
 
 ### Setup
 
@@ -14,7 +15,7 @@ cd storage-production/
 cp env.example .env
 ```
 
-### Start joystream-node and query-node
+### Start joystream-node, query-node and monitoring services
 
 ```sh
 docker compose up -d
@@ -29,10 +30,10 @@ Both services only listen on localhost as they are not intended to be used publi
 
 For more options configuring the [QueryNode](QUERYNODE.md)
 
-A basic open telemetry collector and dashboard is also up and running.
+A basic open telemetry collector and Jaeger dashboard is also up and running.
 Access the [Jaeger](https://www.jaegertracing.io/) telemetry dashboard at http://localhost:16686
 
-Currently only the caddy service is configued to send trace logs to the local collector.
+By default only the caddy service is configued to send trace logs to the local collector.
 
 ### Distributor Node
 If you want to run a Distributor node check the following [instructions](DISTRIBUTOR.md)
@@ -41,4 +42,4 @@ If you want to run a Distributor node check the following [instructions](DISTRIB
 If you want to run a Storage node check the following [instructions](STORAGE.md)
 
 ### Caddy
-Once you have setup your storage or distributor nodes, you will need to make them acessible with a reverse proxy such as nginx or caddy. check followinf [instructions](caddy/README.md).
+Once you have setup your storage or distributor nodes, you will need to make them acessible with a reverse proxy such as nginx or caddy. check followinf [instructions](./caddy/README.md).

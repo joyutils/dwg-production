@@ -2,16 +2,16 @@
 
 ### Setup
 
-- Edit `distributor.compose.yml` to customize volume locations.
-- If you have not modified volume paths create the default:
 ```sh
 mkdir -p ./distributor/config
 mkdir -p ./distributor/keystore
 mkdir -p ./distributor/scratch
+
+cp distributor.example.config.yml ./distributor/config/config.yml
 ```
-- Copy `distributor.example.config.yml` and rename it `config.yml`, place into folder location specified in compose file that maps to `/config` volume. If you haven't changed volumes then it would go in `./distributor/config/config.yml`
-- Edit you config.yml if you want to change default endpoints for joystream-node and query-node. The default configuration assumes you are running joystream-node and query-node on the same docker-compose stack on your host.
-- Copy your distributor role key to the keystore as `./distributor/keystore/distributor-role-key.json`, or set a `suri` or `mnemonic` key in the keys list of the `config.yml` file.
+
+- Copy your distributor role key to the keystore as `./distributor/keystore/distributor-role-key.json`, or set a `suri` or `mnemonic` key in the keys list of the `config.yml` file if you intend to run lead/operator commands from this instance.
+
 - Edit your `config.yml` file and set the correct workerId, and any other settings the lead might ask for.
 
 ### Startup your node
@@ -24,7 +24,7 @@ docker compose -f ./distributor.compose.yml up -d
 
 ```sh
 docker compose -f ./distributor.compose.yml run --rm distributor operator --help
-docker compose -f ./distributor.compose.yml run --rm distributor lead --help
+docker compose -f ./distributor.compose.yml run --rm distributor leader --help
 docker compose -f ./distributor.compose.yml run --rm distributor node --help
 ```
 
