@@ -28,8 +28,6 @@ docker compose run --rm distributor leader --help
 docker compose run --rm distributor node --help
 ```
 
-Remember the commands are running within the container, so if you are passing any arguments such as a path to an input file it should be on a reachable volume like the `/scratch` volume.
-
 Examples:
 
 #### Starting/Stopping the public api.
@@ -53,8 +51,11 @@ docker compose run --rm distributor \
 ```
 
 #### Setting operator metadata
+Remember the commands are running within the container, so if you are passing any arguments such as a path to an input file it should be on a reachable volume like the `/scratch` volume.
+
 Say you have the metadata file in your home directory `~/metadata.json`.
-copy it to the scratch volume path
+
+You copy it to the scratch volume path:
 
 ```sh
 cp ~/metadata.json ./distributor/scratch/metadata.json
@@ -62,7 +63,7 @@ docker compose run --rm distributor \
   operator:set-metadata -B 0:1 -w 13 --input /scratch/metadata.json
 ```
 
-Or you can mount the file directly.
+Or you can mount the file directly:
 
 ```sh
 docker compose run --rm \
