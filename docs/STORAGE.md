@@ -13,15 +13,15 @@ mkdir -p ./storage/keystore
 ### Startup your node
 
 ```sh
-docker compose -f ./storage.compose.yml up -d
+docker compose up -d storage
 ```
 
 ### Running operator and leader commands
 
 ```sh
-docker compose -f ./storage.compose.yml run --rm storage operator --help
-docker compose -f ./storage.compose.yml run --rm storage lead --help
-docker compose -f ./storage.compose.yml run --rm storage dev --help
+docker compose run --rm storage operator --help
+docker compose run --rm storage lead --help
+docker compose run --rm storage dev --help
 ```
 
 Remember the commands are running within the container, so if you are passing any arguments such as a path to an input file it should be on a reachable volume like the `/scratch` volume.
@@ -31,7 +31,7 @@ Examples:
 ### Accepting invitation
 
 ```sh
-docker compose -f ./storage.compose.yml run --rm storage \
+docker compose run --rm storage \
   operator:accept-invitation --bucketId 3 -w 0 --transactorAccountId  ....
 ```
 
@@ -39,7 +39,7 @@ docker compose -f ./storage.compose.yml run --rm storage \
 Say you have the metadata file in your home directory `~/metadata.json`.
 
 ```sh
-docker compose -f ./storage.compose.yml run --rm \
+docker compose run --rm \
   -v ~/metadata.json:/metadata.json \
   storage operator:set-metadata --bucketId 3 -w 10 --jsonFile /metadata.json
 ```

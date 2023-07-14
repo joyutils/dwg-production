@@ -17,15 +17,15 @@ cp distributor.example.config.yml ./distributor/config/config.yml
 ### Startup your node
 
 ```sh
-docker compose -f ./distributor.compose.yml up -d
+docker compose up -d distributor
 ```
 
 ### Running operator, lead and node commands
 
 ```sh
-docker compose -f ./distributor.compose.yml run --rm distributor operator --help
-docker compose -f ./distributor.compose.yml run --rm distributor leader --help
-docker compose -f ./distributor.compose.yml run --rm distributor node --help
+docker compose run --rm distributor operator --help
+docker compose run --rm distributor leader --help
+docker compose run --rm distributor node --help
 ```
 
 Remember the commands are running within the container, so if you are passing any arguments such as a path to an input file it should be on a reachable volume like the `/scratch` volume.
@@ -36,19 +36,19 @@ Examples:
 Notice we use the docker service name to reach the endpoint:
 
 ```sh
-docker compose -f ./distributor.compose.yml run --rm distributor \
+docker compose run --rm distributor \
   node:stop-public-api --url http://distributor:3335/
 ```
 
 ```sh
-docker compose -f ./distributor.compose.yml run --rm distributor \
+docker compose run --rm distributor \
   node:start-public-api --url http://distributor:3335/
 ```
 
 ### Accepting invitation
 
 ```sh
-docker compose -f ./distributor.compose.yml run --rm distributor \
+docker compose run --rm distributor \
   operator:accept-invitation -B 1:4 -w 3
 ```
 
@@ -58,14 +58,14 @@ copy it to the scratch volume path
 
 ```sh
 cp ~/metadata.json ./distributor/scratch/metadata.json
-docker compose -f ./distributor.compose.yml run --rm distributor \
+docker compose run --rm distributor \
   operator:set-metadata -B 0:1 -w 13 --input /scratch/metadata.json
 ```
 
 Or you can mount the file directly.
 
 ```sh
-docker compose -f ./distributor.compose.yml run --rm \
+docker compose run --rm \
   -v ~/metadata.json:/metadata.json \
   distributor operator:set-metadata -B 0:1 -w 13 --input /metadata.json
 ```
