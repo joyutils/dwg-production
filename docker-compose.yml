@@ -32,7 +32,7 @@ services:
       PGPORT: ${DB_PORT}
 
   graphql-server:
-    image: joystream/query-node:1.2.1
+    image: joystream/query-node:1.2.2
     container_name: graphql-server
     restart: unless-stopped
     environment:
@@ -56,17 +56,27 @@ services:
       - TYPEORM_LOGGING=error
       - PROCESSOR_HOST=processor
       - PROCESSOR_STATE_APP_PORT=${PROCESSOR_STATE_APP_PORT}
+      - ENABLE_TELEMETRY=${ENABLE_TELEMETRY:-no}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4318
+      - OTEL_RESOURCE_ATTRIBUTES=service.name=query-node,deployment.environment=production
     ports:
       - "127.0.0.1:${GRAPHQL_SERVER_PORT}:${GRAPHQL_SERVER_PORT}"
       - "127.0.0.1:${PROCESSOR_STATE_APP_PORT}:${PROCESSOR_STATE_APP_PORT}"
     depends_on:
       - db
-      - processor
     working_dir: /joystream
-    command: ['workspace', 'query-node-root', 'query-node:start:prod']
+    entrypoint: bash
+    command: >
+      -c "
+        if [[ "$ENABLE_TELEMETRY" = "yes" ]]; then
+          yarn workspace query-node-root query-node:start:prod:with-instrumentation
+        else
+          yarn workspace query-node-root query-node:start:prod
+        fi
+      "
 
   processor:
-    image: joystream/query-node:1.2.1
+    image: joystream/query-node:1.2.2
     container_name: processor
     restart: unless-stopped
     environment:
@@ -96,8 +106,10 @@ services:
     entrypoint: sh
     command: >
       -c "
+        # We always run db setup script. If already exists or migrated no harm is done
         yarn workspace query-node-root db:prepare ;
         yarn workspace query-node-root db:migrate ;
+        # We always reach here even if previous db prepare/migrate steps fail.
         yarn workspace query-node-root processor:start
       "
 
@@ -152,12 +164,9 @@ services:
     ports:
       - "127.0.0.1:6379:6379"
 
-# Open Telemetry Services
-# Use badger local storage
-# https://www.jaegertracing.io/docs/1.47/deployment/#badger---local-storage
   jaeger:
     container_name: jaeger
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/all-in-one:1.47.0
     volumes:
       - ./badger:/badger
     environment:
@@ -165,11 +174,105 @@ services:
       - BADGER_EPHEMERAL=false
       - BADGER_DIRECTORY_VALUE=/badger/data
       - BADGER_DIRECTORY_KEY=/badger/key
+      - METRICS_STORAGE_TYPE=prometheus
+      - PROMETHEUS_SERVER_URL=http://prometheus:9090
+      - PROMETHEUS_QUERY_SUPPORT_SPANMETRICS_CONNECTOR=true
     ports:
       - '16686:16686'
+
   collector:
     container_name: collector
-    image: otel/opentelemetry-collector:latest
+    image: otel/opentelemetry-collector-contrib:0.80.0
     command: ['--config=/etc/otel-collector-config.yaml']
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "127.0.0.1:4317:4317"   # OTLP gRPC receiver
+      - "127.0.0.1:4318:4318"   # OTLP HTTP receiver
+    depends_on:
+      - jaeger
+      - prometheus
+
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "127.0.0.1:9090:9090"
+
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - 80:80  # Needed for the ACME HTTP-01 challenge.
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/config:/config
+      - ./caddy/data:/data
+    environment:
+      DOMAIN: ${CADDY_DOMAIN}
+      EMAIL: ${CADDY_EMAIL}
+      LOG_FILE: /data/access.log
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://collector:4317/
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_SERVICE_NAME: caddy
+
+  distributor:
+    image: joystream/distributor-node:1.2.1
+    container_name: distributor
+    restart: on-failure
+    volumes:
+      - ./distributor/keystore:/keystore
+      - ./distributor/data:/data
+      - ./distributor/cache:/cache
+      - ./distributor/logs:/logs
+      - ./distributor/scratch:/scratch
+      - ./distributor/config/config.yml:/joystream/distributor-node/config.yml:ro
+      - ./runners/distributor.sh:/joystream/distributor-node/runner.sh:ro
+    working_dir: /joystream/distributor-node
+    ports:
+      - 127.0.0.1:3334:3334 # Public API
+      - 127.0.0.1:3335:3335 # Private node operator API
+    environment:
+      ENABLE_TELEMETRY: ${ENABLE_TELEMETRY:-no}
+      OTEL_APPLICATION: distributor-node
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4318
+      OTEL_RESOURCE_ATTRIBUTES: service.name=argus,deployment.environment=production
+    entrypoint: ['/joystream/distributor-node/runner.sh']
+    command: ['start']
+
+  storage:
+    image: joystream/storage-node:3.5.0
+    container_name: storage
+    restart: unless-stopped
+    volumes:
+      - ./storage/data:/data
+      - ./storage/keystore:/keystore
+      - ./storage/logs:/logs
+      - ./runners/storage.sh:/joystream/storage-node/runner.sh:ro
+    working_dir: /joystream/storage-node
+    ports:
+      - 3333:3333
+    environment:
+      ENABLE_TELEMETRY: ${ENABLE_TELEMETRY:-no}
+      OTEL_APPLICATION: storage-node
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4318
+      OTEL_RESOURCE_ATTRIBUTES: service.name=colossus,deployment.environment=production
+    entrypoint: ['/joystream/storage-node/runner.sh']
+    command: "
+      server
+      --worker 0
+      --port 3333
+      --uploads /data
+      --sync
+      --syncInterval 1
+      --syncWorkersNumber 20
+      --queryNodeEndpoint http://graphql-server:${GRAPHQL_SERVER_PORT}/graphql
+      --apiUrl ${JOYSTREAM_NODE_WS}
+      --logFilePath /logs
+      --logFileChangeFrequency none
+      --keyFile /keystore/keyfile.json
+      "

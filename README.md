@@ -1,44 +1,67 @@
 ## All in one Joystream Storage/Distribution Instance
 
-All you need to run a storage or distributor node for Joystream mainnet, on a single host machine with docker/docker-compose is in this repo.
+All you need to run a storage or distributor node for Joystream mainnet, on a single host machine with docker is in this repo.
 
 ### Requirements
 
-Docker
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/#install-compose) v2.0.0+
 
-### Setup
+### Walkthrough
+Prepare a top level `.env` for some configurable values.
 
 ```sh
-git clone https://github.com/mnaamani/storage-production
-cd storage-production/
 cp env.example .env
 ```
 
-### Start joystream-node and query-node
-
+Start a joystream-node
 ```sh
-docker compose up -d
+docker compose up -d joystream-node
 ```
 
-You now have a joystream-node and query-node up and running.
+Start the QueryNode indexing services
+
+```sh
+docker compose up -d db
+docker compose up -d indexer
+docker compose up -d hydra-indexer-gateway
+```
+
+Start QueryNode processor and GraphQL frontend
+
+```sh
+docker compose up -d processor
+docker compose up -d graphql-server
+```
 A working graphql endpoint should be accessible at http://localhost:8081/graphql
+For additional configuring options for the query node check the [docs](./docs/QUERYNODE.md)
 
-You should wait for nodes to fully sync up before using it in production.
+If you enabled telemetry (by setting `ENABLE_TELEMETRY=yes` in your `.env` file) start the telemetry services.
 
-Both services only listen on localhost as they are not intended to be used publicly and reserved for the storage/distributors running on the same host.
+```sh
+docker compose up -d collector
+```
+Access the Jaeger UI dashboard at http://localhost:16686
 
-For more options configuring the [QueryNode](QUERYNODE.md)
-
-A basic open telemetry collector and dashboard is also up and running.
-Access the [Jaeger](https://www.jaegertracing.io/) telemetry dashboard at http://localhost:16686
-
-Currently only the caddy service is configued to send trace logs to the local collector.
+Before going further, you should wait for nodes to fully sync up before using them production for your storage or distributor nodes.
 
 ### Distributor Node
-If you want to run a Distributor node check the following [instructions](DISTRIBUTOR.md)
+To run a Distributor node check the following [instructions](./docs/DISTRIBUTOR.md)
 
 ### Storage Node
-If you want to run a Storage node check the following [instructions](STORAGE.md)
+To run a Storage node check the following [instructions](./docs/STORAGE.md)
 
 ### Caddy
-Once you have setup your storage or distributor nodes, you will need to make them acessible with a reverse proxy such as nginx or caddy. check followinf [instructions](caddy/README.md).
+Once you have setup your storage or distributor node, you will need to make them acessible with a caddy webserver. 
+
+All you need to do is set your `CADDY_DOMAIN` and `CADDY_EMAIL` in [.env](./.env) then start it up:
+
+```sh
+docker compose up -d caddy
+```
+
+You can make any necessary changes in the [Caddyfile](./Caddyfile). Then to gracefully reload the configuration:
+
+```sh
+docker exec caddy caddy reload --config /etc/caddy/Caddyfile
+```

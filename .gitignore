@@ -1,7 +1,8 @@
-db/
-chain/
-.env
-./types/augment/all/defs.json
-storage/
-distributor/
-badger/
+/db
+/chain
+/.env
+/types/augment/all/defs.json
+/storage
+/distributor
+/badger
+/caddy
