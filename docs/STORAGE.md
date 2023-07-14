@@ -6,9 +6,9 @@
 mkdir -p ./storage/keystore
 ```
 
-- Copy your storage transactor key to the keystore as `./storage/keystore/keyfile.json`, or pass it as a `accountUri` argument in the `storage.compose.yml`
+- Copy your storage transactor key to the keystore as `./storage/keystore/keyfile.json`, or pass it as a `accountUri` argument in the `docker-compose.yml` under storage service.
 
-- Make sure to set correct worker id in `storage.compose.yml`.
+- Make sure to set correct worker id in `docker-compose.yml`.
 
 ### Startup your node
 
