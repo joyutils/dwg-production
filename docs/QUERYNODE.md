@@ -29,7 +29,7 @@ docker compose rm -vsf graphql-server
 # Make sure to use the correct name of the databse as in our .env file PROCESSOR_DB_NAME
 docker exec db psql -U postgres -c "DROP DATABASE query_node_processor;"
 
-# Upate the version of query-node image in docker-compose.yml for the processor and query-node sevices.
+# Upate the version of query-node image in docker-compose.yml for the processor and graphql-server sevices.
 # Then bring the services back up.
 docker compose up -d processor
 docker compose up -d graphql-server
