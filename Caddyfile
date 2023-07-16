@@ -1,21 +1,40 @@
-{$DOMAIN}/distributor/* {
-  uri strip_prefix /distributor
-  reverse_proxy distributor:3334
-  log {
-    output stderr
-  }
-  tracing {
-    span distributor_caddy
-  }
+{
+	log {
+		output stderr
+		level warn
+	}
 }
 
-{$DOMAIN}/storage/* {
-  uri strip_prefix /storage
-  reverse_proxy storage:3333
-  log {
-    output stderr
-  }
-  tracing {
-    span storage_caddy
-  }
+{$DOMAIN::2020} {
+	# Route requests to the distributor node(s)
+	handle_path /distributor/* {
+		reverse_proxy distributor:3334
+		tracing {
+			span distributor_caddy
+		}
+	}
+
+	# 'named matcher' used to redirect HTTP POST requests (file uploads)
+	# to the storage node API to a different node.
+	@post {
+		method POST
+	}
+
+	# Route requests to the storage node(s) cluster
+	# These nodes ideally share an external storage volume.
+	handle_path /storage/* {
+		# Upload requests to a single node
+		reverse_proxy @post /api/v1/files storage:3333
+		# All other requests
+		reverse_proxy {
+			lb_policy random_choose 2
+			# List of nodes to load balance connections to. These nodes
+			# would be effectively 'read-only' nodes.
+			to storage:3333
+			to storage:3333
+		}
+		tracing {
+			span storage_caddy
+		}
+	}
 }
