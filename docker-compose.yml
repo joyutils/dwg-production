@@ -208,13 +208,13 @@ services:
     ports:
       - 80:80  # Needed for the ACME HTTP-01 challenge.
       - 443:443
+      - 2020:2020 # Default port in Caddyfile if CADDY_DOMAIN not set.
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy/config:/config
       - ./caddy/data:/data
     environment:
       DOMAIN: ${CADDY_DOMAIN}
-      EMAIL: ${CADDY_EMAIL}
       LOG_FILE: /data/access.log
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://collector:4317/
       OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
@@ -264,7 +264,7 @@ services:
     entrypoint: ['/joystream/storage-node/runner.sh']
     command: "
       server
-      --worker 0
+      --worker 1000
       --port 3333
       --uploads /data
       --sync
