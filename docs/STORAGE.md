@@ -6,7 +6,7 @@
 mkdir -p ./storage/keystore
 ```
 
-- Copy your storage transactor key to the keystore as `./storage/keystore/keyfile.json`, or pass it as a `accountUri` argument in the `docker-compose.yml` under storage service.
+- Copy your storage transactor key to the keystore as `./storage/keystore/keyfile.json`. Using keyfiles is recommended over passing `mnemonic` or `suri` with `--accountUri` since the commandline args are shared over telemetry spans!
 
 - Make sure to set correct worker id in `docker-compose.yml`.
 
