@@ -6,7 +6,7 @@
 }
 
 {$DOMAIN::2020} {
-	# Route requests to the distributor node(s)
+	# Route requests to the distributor node
 	handle_path /distributor/* {
 		reverse_proxy distributor:3334
 		tracing {
@@ -14,27 +14,35 @@
 		}
 	}
 
-	# 'named matcher' used to redirect HTTP POST requests (file uploads)
-	# to the storage node API to a different node.
-	@post {
-		method POST
-	}
-
-	# Route requests to the storage node(s) cluster
-	# These nodes ideally share an external storage volume.
-	handle_path /storage/* {
-		# Upload requests to a single node
-		reverse_proxy @post /api/v1/files storage:3333
-		# All other requests
-		reverse_proxy {
-			lb_policy random_choose 2
-			# List of nodes to load balance connections to. These nodes
-			# would be effectively 'read-only' nodes.
-			to storage:3333
-			to storage:3333
-		}
-		tracing {
-			span storage_caddy
-		}
+	# Route requests to the storage node
+	handle_path /storage/* storage:3333
+	tracing {
+		span storage_caddy
 	}
 }
+
+# For future configuration when storage-node released that works
+# correctly with multiple nodes sharing an 'uploads' volume.
+#
+# # 'named matcher' used to redirect HTTP POST requests (file uploads)
+# # to the storage node API to a different node.
+# @post {
+# 	method POST
+# }
+# # Route requests to the storage node(s) cluster
+# # These nodes ideally share an external storage volume.
+# handle_path /storage/* {
+# 	# Upload requests to a single node
+# 	reverse_proxy @post /api/v1/files storage-1:3333
+# 	# All other requests
+# 	reverse_proxy {
+# 		lb_policy random_choose 2
+# 		# List of nodes to load balance connections to. These nodes
+# 		# would be effectively 'read-only' nodes.
+# 		to storage-1:3333
+# 		to storage-2:3333
+# 	}
+# 	tracing {
+# 		span storage_caddy
+# 	}
+# }
