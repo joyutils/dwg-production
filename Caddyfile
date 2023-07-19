@@ -15,9 +15,11 @@
 	}
 
 	# Route requests to the storage node
-	handle_path /storage/* storage:3333
-	tracing {
-		span storage_caddy
+	handle_path /storage/* {
+		reverse_proxy storage:3333
+		tracing {
+			span storage_caddy
+		}
 	}
 }
 
