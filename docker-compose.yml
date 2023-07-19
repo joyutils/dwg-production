@@ -183,7 +183,7 @@ services:
       - PROMETHEUS_SERVER_URL=http://prometheus:9090
       - PROMETHEUS_QUERY_SUPPORT_SPANMETRICS_CONNECTOR=true
     ports:
-      - '16686:16686'
+      - '127.0.0.1:16686:16686'
 
   collector:
     container_name: collector
