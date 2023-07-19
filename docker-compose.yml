@@ -59,6 +59,7 @@ services:
       - ENABLE_TELEMETRY=${ENABLE_TELEMETRY:-no}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4318
       - OTEL_RESOURCE_ATTRIBUTES=service.name=query-node,deployment.environment=production
+      - NODE_ENV=${NODE_ENV}
     ports:
       - "127.0.0.1:${GRAPHQL_SERVER_PORT}:${GRAPHQL_SERVER_PORT}"
       - "127.0.0.1:${PROCESSOR_STATE_APP_PORT}:${PROCESSOR_STATE_APP_PORT}"
@@ -100,6 +101,7 @@ services:
       - TYPEORM_LOGGING=error
       # State update endpoint used by prcessor (to send state updates)
       - STATE_UPDATE_ENDPOINT=http://graphql-server:${PROCESSOR_STATE_APP_PORT}/update-processor-state
+      - NODE_ENV=${NODE_ENV}
     depends_on:
       - db
     working_dir: /joystream
@@ -131,6 +133,7 @@ services:
       # Note, that if there are already some indexed events, this setting is ignored
       - BLOCK_HEIGHT=0
       - TYPEORM_LOGGING=error
+      - NODE_ENV=${NODE_ENV}
     depends_on:
       - db
       - redis
@@ -151,6 +154,7 @@ services:
       - WARTHOG_APP_PORT=${HYDRA_INDEXER_GATEWAY_PORT}
       - PORT=${HYDRA_INDEXER_GATEWAY_PORT}
       # - DEBUG=*
+      - NODE_ENV=${NODE_ENV}
     ports:
       - "${HYDRA_INDEXER_GATEWAY_PORT}:${HYDRA_INDEXER_GATEWAY_PORT}"
     depends_on:
@@ -244,6 +248,7 @@ services:
       OTEL_APPLICATION: distributor-node
       OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4318
       OTEL_RESOURCE_ATTRIBUTES: service.name=argus,deployment.environment=production
+      NODE_ENV: ${NODE_ENV}
     entrypoint: ['/joystream/distributor-node/runner.sh']
     command: ['start']
 
@@ -264,6 +269,7 @@ services:
       OTEL_APPLICATION: storage-node
       OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4318
       OTEL_RESOURCE_ATTRIBUTES: service.name=colossus,deployment.environment=production
+      NODE_ENV: ${NODE_ENV}
     entrypoint: ['/joystream/storage-node/runner.sh']
     command: "
       server
