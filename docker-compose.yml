@@ -1,5 +1,5 @@
 # QueryNode Infrastructure
-version: '3.4'
+version: "3.7"
 services:
   joystream-node:
     image: joystream/node:76f7f9d6fb20e85308d9b055d9698a654759c930
@@ -15,15 +15,15 @@ services:
       --base-path /chain
       --chain /joy-mainnet.json
     ports:
-      - '127.0.0.1:9944:9944'
-      - '127.0.0.1:9933:9933'
+      - "127.0.0.1:9944:9944"
+      - "127.0.0.1:9933:9933"
 
   db:
     image: postgres:14
     container_name: db
     restart: unless-stopped
     ports:
-      - '127.0.0.1:${DB_PORT}:${DB_PORT}'
+      - "127.0.0.1:${DB_PORT}:${DB_PORT}"
     volumes:
       - ${DATABASE_VOLUME}:/var/lib/postgresql/data
     environment:
@@ -183,7 +183,7 @@ services:
       - PROMETHEUS_SERVER_URL=http://prometheus:9090
       - PROMETHEUS_QUERY_SUPPORT_SPANMETRICS_CONNECTOR=true
     ports:
-      - '127.0.0.1:16686:16686'
+      - "127.0.0.1:16686:16686"
 
   collector:
     container_name: collector
@@ -205,8 +205,12 @@ services:
     restart: unless-stopped
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus:/prometheus
     ports:
-      - "127.0.0.1:9090:9090"
+      - 127.0.0.1:9090:9090
+    # Allow prometheus to connect to host, to reach targets not running as containers
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   caddy:
     image: caddy:2
