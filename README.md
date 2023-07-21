@@ -4,8 +4,10 @@ All you need to run a storage or distributor node for Joystream mainnet, on a si
 
 ### Requirements
 
-- [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/install/#install-compose) v2.0.0+
+- [Docker Server](https://docs.docker.com/engine/install/#server)
+- [Docker Compose](https://docs.docker.com/compose/install/#install-compose) v2+
+
+You can also use docker desktop but is not the recommended way to run a production instance :)
 
 ### Walkthrough
 Prepare a top level `.env` for some configurable values.
