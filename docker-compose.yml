@@ -253,7 +253,7 @@ services:
       OTEL_APPLICATION: distributor-node
       OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4318
       OTEL_RESOURCE_ATTRIBUTES: service.name=argus,deployment.environment=production
-      NODE_ENV: ${NODE_ENV}
+      NODE_ENV: prod
     entrypoint: ['/joystream/distributor-node/runner.sh']
     command: ['start']
 
