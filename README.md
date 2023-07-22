@@ -9,6 +9,8 @@ All you need to run a storage or distributor node for Joystream mainnet, on a si
 
 You can also use docker desktop but is not the recommended way to run a production instance :)
 
+Docker provides a [convenience script](https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script) to make installation process a little easier.
+
 ### Walkthrough
 Prepare a top level `.env` for some configurable values.
 
@@ -45,22 +47,33 @@ docker compose up -d collector
 ```
 Access the Jaeger UI dashboard at http://localhost:16686
 
-Before going further, you should wait for nodes to fully sync up before using them production for your storage or distributor nodes.
+Before going further, you should wait for the processor to fully sync up before using them production for your storage or distributor nodes.
+
+You can track its progress by looking at the logs:
+
+```sh
+docker logs --tail 100 --follow processor
+```
 
 ### Distributor Node
-To run a Distributor node check the following [instructions](./docs/DISTRIBUTOR.md)
+To run a Distributor node follow these [instructions](./docs/DISTRIBUTOR.md)
 
 ### Storage Node
-To run a Storage node check the following [instructions](./docs/STORAGE.md)
+To run a Storage node follow these [instructions](./docs/STORAGE.md)
 
 ### Caddy
-Once you have setup your storage or distributor node, you will need to make them acessible with a caddy webserver. 
+Once you have setup your storage or distributor node, you will need to make them publicly acessible with a caddy webserver. 
 
-All you need to do is set your `CADDY_DOMAIN` and `CADDY_EMAIL` in [.env](./.env) then start it up:
+All you need to do is set your `CADDY_DOMAIN` in [.env](./.env) then start it up:
 
 ```sh
 docker compose up -d caddy
 ```
+
+If you set `CADDY_DOMAIN=https://mydistributor.cooldomain.net` your can check their status at:
+
+`https://mydistributor.cooldomain.net/distributor/api/v1/status` if you setup the distributor node.
+`https://mydistributor.cooldomain.net/storage/api/v1/status` if you setup the storage node.
 
 You can make any necessary changes in the [Caddyfile](./Caddyfile). Then to gracefully reload the configuration:
 
