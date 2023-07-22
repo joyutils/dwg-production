@@ -253,6 +253,8 @@ services:
       OTEL_APPLICATION: distributor-node
       OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4318
       OTEL_RESOURCE_ATTRIBUTES: service.name=argus,deployment.environment=production
+      # Change NODE_ENV to production after updating to new version when following PR is merged
+      # https://github.com/Joystream/joystream/pull/4810
       NODE_ENV: prod
     entrypoint: ['/joystream/distributor-node/runner.sh']
     command: ['start']
