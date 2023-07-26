@@ -1,5 +1,5 @@
 # QueryNode Infrastructure
-version: "3.7"
+version: "3.8"
 services:
   joystream-node:
     image: joystream/node:76f7f9d6fb20e85308d9b055d9698a654759c930
@@ -26,10 +26,12 @@ services:
       - "127.0.0.1:${DB_PORT}:${DB_PORT}"
     volumes:
       - ${DATABASE_VOLUME}:/var/lib/postgresql/data
+      - ./postgres.conf:/etc/postgresql/postgresql.conf
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
       PGPORT: ${DB_PORT}
+    command: ['postgres', '-c', 'config_file=/etc/postgresql/postgresql.conf', '-p', '${DB_PORT}']
 
   graphql-server:
     image: joystream/query-node:1.2.2
