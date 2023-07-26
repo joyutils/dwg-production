@@ -294,3 +294,8 @@ services:
 
 volumes:
   prometheus-data: {}
+
+networks:
+  default:
+    name: joystream_default
+    # external: true
