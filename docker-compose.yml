@@ -205,8 +205,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      # Some permission issues causing this to fail?
-      # - ./prometheus:/prometheus
+      - prometheus-data:/prometheus
     ports:
       - 127.0.0.1:9090:9090
     # Allow prometheus to connect to host, to reach targets not running as containers
@@ -292,3 +291,6 @@ services:
       --logFileChangeFrequency none
       --keyFile /keystore/keyfile.json
       "
+
+volumes:
+  prometheus-data: {}
