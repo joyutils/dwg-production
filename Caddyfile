@@ -12,6 +12,8 @@
 		tracing {
 			span distributor_caddy
 		}
+		header -Access-Control-Allow-Methods
+		header Access-Control-Allow-Methods "GET, HEAD"
 	}
 
 	# Route requests to the storage node
@@ -21,7 +23,7 @@
 			span storage_caddy
 		}
 	}
-	
+
 	# Optionally allow jaeger and prometheus server to monitor remotely. 
 	# Generally not a good idea as traces and metrics may reveal sensitive information.
 	# Prometheus
