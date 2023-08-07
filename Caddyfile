@@ -12,8 +12,6 @@
 		tracing {
 			span distributor_caddy
 		}
-		header -Access-Control-Allow-Methods
-		header Access-Control-Allow-Methods "GET, HEAD"
 	}
 
 	# Route requests to the storage node
