@@ -35,7 +35,7 @@ services:
     command: ['postgres', '-c', 'config_file=/etc/postgresql/postgresql.conf', '-p', '${DB_PORT}']
 
   graphql-server:
-    image: joystream/query-node:1.2.2
+    image: joystream/query-node:1.3.0
     container_name: graphql-server
     restart: unless-stopped
     environment:
@@ -80,7 +80,7 @@ services:
       "
 
   processor:
-    image: joystream/query-node:1.2.2
+    image: joystream/query-node:1.3.0
     container_name: processor
     restart: unless-stopped
     environment:
