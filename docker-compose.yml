@@ -2,18 +2,19 @@
 version: "3.8"
 services:
   joystream-node:
-    image: joystream/node:76f7f9d6fb20e85308d9b055d9698a654759c930
+    image: joystream/node:latest
     restart: unless-stopped
     container_name: joystream-node
     volumes:
       - ${CHAIN_BASE_PATH}:/chain
-      - ./joy-mainnet.json:/joy-mainnet.json
     command: >
       --pruning=archive
-      --ws-external --rpc-cors all
-      --unsafe-ws-external --unsafe-rpc-external --rpc-methods Safe
+      --ws-external
+      --rpc-external
+      --rpc-methods Safe
+      --rpc-cors all
       --base-path /chain
-      --chain /joy-mainnet.json
+      --chain /joystream/joy-mainnet.json
     ports:
       - "127.0.0.1:9944:9944"
       - "127.0.0.1:9933:9933"
