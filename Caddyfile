@@ -1,4 +1,8 @@
 {
+	servers {
+		# Disable http v2 and v3
+		protocols h1
+	}
 	log {
 		output stderr
 		level warn
