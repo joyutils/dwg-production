@@ -179,7 +179,7 @@ services:
     volumes:
       - ./badger:/badger
     environment:
-      - MEMORY_MAX_TRACES=25000
+      - MEMORY_MAX_TRACES=5000
       - SPAN_STORAGE_TYPE=badger
       - BADGER_EPHEMERAL=false
       - BADGER_DIRECTORY_VALUE=/badger/data
