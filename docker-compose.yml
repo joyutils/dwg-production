@@ -1,4 +1,3 @@
-# QueryNode Infrastructure
 version: "3.8"
 services:
   joystream-node:
@@ -6,7 +5,7 @@ services:
     restart: unless-stopped
     container_name: joystream-node
     volumes:
-      - ${CHAIN_BASE_PATH}:/chain
+      - ${CHAIN_VOLUME}:/chain
     command: >
       --pruning=archive
       --ws-external
@@ -33,7 +32,14 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
       PGPORT: ${DB_PORT}
-    command: ['postgres', '-c', 'config_file=/etc/postgresql/postgresql.conf', '-p', '${DB_PORT}']
+    command:
+      [
+        "postgres",
+        "-c",
+        "config_file=/etc/postgresql/postgresql.conf",
+        "-p",
+        "${DB_PORT}",
+      ]
 
   graphql-server:
     image: joystream/query-node:1.3.0
@@ -195,12 +201,12 @@ services:
     container_name: collector
     image: otel/opentelemetry-collector-contrib:0.80.0
     restart: unless-stopped
-    command: ['--config=/etc/otel-collector-config.yaml']
+    command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
     ports:
-      - "127.0.0.1:4317:4317"   # OTLP gRPC receiver
-      - "127.0.0.1:4318:4318"   # OTLP HTTP receiver
+      - "127.0.0.1:4317:4317" # OTLP gRPC receiver
+      - "127.0.0.1:4318:4318" # OTLP HTTP receiver
     depends_on:
       - jaeger
       - prometheus
@@ -223,7 +229,7 @@ services:
     container_name: caddy
     restart: unless-stopped
     ports:
-      - 80:80  # Needed for the ACME HTTP-01 challenge.
+      - 80:80 # Needed for the ACME HTTP-01 challenge.
       - 443:443
       - 2020:2020 # Default port in Caddyfile if CADDY_DOMAIN not set.
     volumes:
@@ -238,16 +244,16 @@ services:
       OTEL_SERVICE_NAME: caddy
 
   distributor:
-    image: joystream/distributor-node:1.2.1
+    image: joystream/distributor-node:1.3.0
     container_name: distributor
     restart: unless-stopped
     volumes:
-      - ./distributor/keystore:/keystore
-      - ./distributor/data:/data
-      - ./distributor/cache:/cache
-      - ./distributor/logs:/logs
-      - ./distributor/scratch:/scratch
-      - ./distributor/config/config.yml:/joystream/distributor-node/config.yml:ro
+      - ${DISTRIBUTOR_KEYSTORE_VOLUME}:/keystore
+      - ${DISTRIBUTOR_DATA_VOLUME}:/data
+      - ${DISTRIBUTOR_CACHE_VOLUME}:/cache
+      - ${DISTRIBUTOR_LOGS_VOLUME}:/logs
+      - ${DISTRIBUTOR_SCRATCH_VOLUME}:/scratch
+      - ${DISTRIBUTOR_CONFIG_VOLUME}:/joystream/distributor-node/config.yml:ro
       - ./runners/distributor.sh:/joystream/distributor-node/runner.sh:ro
     working_dir: /joystream/distributor-node
     ports:
@@ -261,17 +267,17 @@ services:
       # Change NODE_ENV to production after updating to new version when following PR is merged
       # https://github.com/Joystream/joystream/pull/4810
       NODE_ENV: prod
-    entrypoint: ['/joystream/distributor-node/runner.sh']
-    command: ['start']
+    entrypoint: ["/joystream/distributor-node/runner.sh"]
+    command: ["start"]
 
   storage:
     image: joystream/storage-node:3.5.0
     container_name: storage
     restart: unless-stopped
     volumes:
-      - ./storage/data:/data
-      - ./storage/keystore:/keystore
-      - ./storage/logs:/logs
+      - ${STORAGE_KEYSTORE_VOLUME}:/keystore
+      - ${STORAGE_DATA_VOLUME}:/data
+      - ${STORAGE_LOGS_VOLUME}:/logs
       - ./runners/storage.sh:/joystream/storage-node/runner.sh:ro
     working_dir: /joystream/storage-node
     ports:
@@ -282,7 +288,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4318
       OTEL_RESOURCE_ATTRIBUTES: service.name=colossus,deployment.environment=production
       NODE_ENV: ${NODE_ENV}
-    entrypoint: ['/joystream/storage-node/runner.sh']
+    entrypoint: ["/joystream/storage-node/runner.sh"]
     command: "
       server
       --worker 1000

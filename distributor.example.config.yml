@@ -20,13 +20,13 @@ logs:
   #     username: username
   #     password: password
 limits:
-  storage: 250G
+  storage: 500G
   maxConcurrentStorageNodeDownloads: 100
   maxConcurrentOutboundConnections: 300
   outboundRequestsTimeoutMs: 5000
   pendingDownloadTimeoutSec: 3600
-  # shouldn't this be higher? or large files are not getting cached and always fetched from SP?
-  maxCachedItemSize: 1G
+  maxCachedItemSize: 20G
+  queryNodeCacheTTL: 60
 intervals:
   saveCacheState: 60
   checkStorageNodeResponseTimes: 60
