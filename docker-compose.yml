@@ -220,9 +220,8 @@ services:
       - prometheus-data:/prometheus
     ports:
       - 127.0.0.1:9090:9090
-    # Allow prometheus to connect to host, to reach targets not running as containers
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    depends_on:
+      - node-exporter
 
   node-exporter:
     image: prom/node-exporter:latest

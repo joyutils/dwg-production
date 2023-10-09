@@ -12,6 +12,7 @@ You can also use docker desktop but is not the recommended way to run a producti
 Docker provides a [convenience script](https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script) to make installation process a little easier.
 
 ### Walkthrough
+
 Prepare a top level `.env` for some configurable values.
 
 ```sh
@@ -19,6 +20,7 @@ cp env.example .env
 ```
 
 Start a joystream-node
+
 ```sh
 docker compose up -d joystream-node
 ```
@@ -37,15 +39,15 @@ Start QueryNode processor and GraphQL frontend
 docker compose up -d processor
 docker compose up -d graphql-server
 ```
+
 A working graphql endpoint should be accessible at http://localhost:8081/graphql
 For additional configuring options for the query node check the [docs](./docs/QUERYNODE.md)
 
-If you enabled telemetry (by setting `ENABLE_TELEMETRY=yes` in your `.env` file) start the telemetry services.
+Start monitoring
 
 ```sh
-docker compose up -d collector
+docker compose up -d prometheus
 ```
-Access the Jaeger UI dashboard at http://localhost:16686
 
 Before going further, you should wait for the processor to fully sync up before using them production for your storage or distributor nodes.
 
@@ -56,13 +58,16 @@ docker logs --tail 100 --follow processor
 ```
 
 ### Distributor Node
+
 To run a Distributor node follow these [instructions](./docs/DISTRIBUTOR.md)
 
 ### Storage Node
+
 To run a Storage node follow these [instructions](./docs/STORAGE.md)
 
 ### Caddy
-Once you have setup your storage or distributor node, you will need to make them publicly acessible with a caddy webserver. 
+
+Once you have setup your storage or distributor node, you will need to make them publicly acessible with a caddy webserver.
 
 All you need to do is set your `CADDY_DOMAIN` in [.env](./.env) then start it up:
 
