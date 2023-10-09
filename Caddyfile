@@ -19,7 +19,7 @@
 	}
 
 	handle_path /query/* {
-		reverse_proxy localhost:8081
+		reverse_proxy graphql-server:8081
 	}
 
 	route /prometheus* {
@@ -32,8 +32,8 @@
 			monitoring $2a$14$gbe8Y/6JZX6RNmS.GuLIp.Cqey3OLguTx83e0xgaYpyXPOCokAI3W
 		}
 
-		reverse_proxy http://localhost:9090
-  }
+		reverse_proxy prometheus:9090
+	}
 
 	# Optionally allow jaeger and prometheus server to monitor remotely. 
 	# Generally not a good idea as traces and metrics may reveal sensitive information.
