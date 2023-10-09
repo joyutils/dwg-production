@@ -35,7 +35,7 @@ In your `.env`, provide valid values for `CHAIN_VOLUME`, `DATABASE_VOLUME`, `DIS
 If you used default monorepo setup for QN, your DB data is probably in Docker volume. Assuming it's called `joystream_query-node-data` (default), you can extract it to local ./db directory:
 
 ```sh
-docker run --rm -v joysteam_query-node-data:/volume -v $(pwd)/db:/backup alpine tar -czvf /backup/backup.tar.gz -C /volume ./
+docker run --rm -v joystream_query-node-data:/volume -v $(pwd)/db:/backup alpine tar -czvf /backup/backup.tar.gz -C /volume ./
 tar -xzvf ./db/backup.tar.gz -C ./db
 rm ./db/backup.tar.gz
 ```
@@ -53,3 +53,10 @@ Place your current distributor config based on `DISTRIBUTOR_CONFIG_VOLUME`. Upda
 2. `intervals` section
 
 Now start the distributor and you should be done.
+
+At this point you should no longer need old `joystream` monorepo. You can clean it up with (this will remove any volumes so only do that if you've migrated the data outside of Docker volumes)
+
+```
+docker compose down -v
+# then you can delete the monorepo
+```
