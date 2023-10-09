@@ -32,6 +32,14 @@ Secondly, clone the repo https://github.com/kdembler/dwg-production Follow instr
 
 In your `.env`, provide valid values for `CHAIN_VOLUME`, `DATABASE_VOLUME`, `DISTRIBUTOR_DATA_VOLUME`, `DISTRIBUTOR_CACHE_VOLUME` and `DISTRIBUTOR_LOGS_VOLUME`. Those volumes should point at where you currently keep all the chain/QN/Argus data.
 
+If you used default monorepo setup for QN, your DB data is probably in Docker volume. Assuming it's called `joystream_query-node-data` (default), you can extract it to local ./db directory:
+
+```sh
+docker run --rm -v joysteam_query-node-data:/volume -v $(pwd)/db:/backup alpine tar -czvf /backup/backup.tar.gz -C /volume ./
+tar -xzvf ./db/backup.tar.gz -C ./db
+rm ./db/backup.tar.gz
+```
+
 Specify your domain in `CADDY_DOMAIN` if you’re going to use Caddy with Docker. If not, you will need to adjust your existing proxy based on provided `Caddyfile`.
 Proceed with starting the services as specified in README.
 
