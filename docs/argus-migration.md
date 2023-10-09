@@ -33,7 +33,9 @@ Secondly, clone the repo https://github.com/kdembler/dwg-production Follow instr
 In your `.env`, provide valid values for `CHAIN_VOLUME`, `DATABASE_VOLUME`, `DISTRIBUTOR_DATA_VOLUME`, `DISTRIBUTOR_CACHE_VOLUME` and `DISTRIBUTOR_LOGS_VOLUME`. Those volumes should point at where you currently keep all the chain/QN/Argus data.
 
 Specify your domain in `CADDY_DOMAIN` if you’re going to use Caddy with Docker. If not, you will need to adjust your existing proxy based on provided `Caddyfile`.
-Proceed with starting the services as specified in README. Confirm that processor is processing new blocks. Confirm that you can connect at `https://<YOUR_DOMAIN>/query/graphql`
+Proceed with starting the services as specified in README.
+
+Confirm that processor is processing new blocks. Confirm that you can connect at `https://<YOUR_DOMAIN>/query/graphql`
 
 Once you start all the base services, follow instructions from https://github.com/kdembler/dwg-production/blob/main/docs/DISTRIBUTOR.md
 
