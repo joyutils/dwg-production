@@ -1,8 +1,8 @@
 {
-	servers {
-		# Disable http v2 and v3
-		protocols h1
-	}
+	# servers {
+	# 	# Disable http v2 and v3
+	# 	protocols h1
+	# }
 	log {
 		output stderr
 		level warn
@@ -18,13 +18,22 @@
 		}
 	}
 
-	# Route requests to the storage node
-	handle_path /storage/* {
-		reverse_proxy storage:3333
-		tracing {
-			span storage_caddy
-		}
+	handle_path /query/* {
+		reverse_proxy localhost:8081
 	}
+
+	route /prometheus* {
+		uri strip_prefix /prometheus
+
+		@notAllowedIP not remote_ip 65.21.233.125 # monitoring.joyutils.org
+		respond @notAllowedIP 403
+
+		basicauth {
+			monitoring $2a$14$gbe8Y/6JZX6RNmS.GuLIp.Cqey3OLguTx83e0xgaYpyXPOCokAI3W
+		}
+
+		reverse_proxy http://localhost:9090
+  }
 
 	# Optionally allow jaeger and prometheus server to monitor remotely. 
 	# Generally not a good idea as traces and metrics may reveal sensitive information.
