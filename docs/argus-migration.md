@@ -1,7 +1,5 @@
 # Migrating from monorepo setup to Docker images
 
-With successful migration there should be no need to resync anything.
-
 First, stop all your current services gracefully.
 
 ```
@@ -30,11 +28,16 @@ systemctl disable caddy
 
 Secondly, clone the repo https://github.com/kdembler/dwg-production Follow instructions in the README.
 
-In your `.env`, provide valid values for `CHAIN_VOLUME`, `DATABASE_VOLUME`, `DISTRIBUTOR_DATA_VOLUME`, `DISTRIBUTOR_CACHE_VOLUME` and `DISTRIBUTOR_LOGS_VOLUME`. Those volumes should point at where you currently keep all the chain/QN/Argus data.
+In your `.env`, provide valid values for data volumes. Those volumes should point at where you currently keep all the chain/QN/Argus data:
 
-If you used default monorepo setup for QN, your DB data is most likely created with Postgres@12. In that case, it makes most sense to start fresh and sync. To speed up QN processor sync, use external indexer until your own indexer is synced: `PROCESSOR_INDEXER_GATEWAY=https://mainnet-rpc-1.joystream.org/query-node/indexer/graphql`
+- `CHAIN_VOLUME` - this is directory with Joystream Node data, it contains a single `chains/` directory, location will depend on your config, by default it may be `/root/.local/share/joystream-node`
+- `DISTRIBUTOR_DATA_VOLUME` - directory with all Distributor data, it contains a bunch of files with IDs as names, default location was `<JOYSTREAM_MONOREPO>/distributor/local/data`
+- `DISTRIBUTOR_CACHE_VOLUME` - directory with single `cache.json` file, default location was `<JOYSTREAM_MONOREPO>/distributor/local/cache`
+- `DATABASE_VOLUME` - only set this if you were running Postgres@14 previously, otherwise keep default and sync QN fresh. If you have valid DB, set this it to your previous database location. By default it was a Docker volume called `joystream_query-node-data`.
 
-If you have a DB created with Postgres@14, it's porbably in Docker container. Assuming it's called `joystream_query-node-data` (default), you can extract it to local ./db directory:
+If you need to sync QN again, to speed up QN processor sync, use external indexer until your own indexer is synced: `PROCESSOR_INDEXER_GATEWAY=https://mainnet-rpc-1.joystream.org/query-node/indexer/graphql`
+
+If you have a Postgres@14 DB, you can extract it from Docker volume to local ./db directory:
 
 ```sh
 docker run --rm -v joystream_query-node-data:/volume -v $(pwd)/db:/backup alpine tar -czvf /backup/backup.tar.gz -C /volume ./
@@ -49,7 +52,7 @@ Confirm that processor is processing new blocks. Confirm that you can connect at
 
 Once you start all the base services, follow instructions from https://github.com/kdembler/dwg-production/blob/main/docs/DISTRIBUTOR.md
 
-Place your current distributor config based on `DISTRIBUTOR_CONFIG_VOLUME`. Update your config, use values from https://github.com/kdembler/dwg-production/blob/main/distributor.example.config.yml for following settings:
+Place your current distributor config based on `DISTRIBUTOR_CONFIG_VOLUME`. **Update your config, use values from https://github.com/kdembler/dwg-production/blob/main/distributor.example.config.yml for following settings:**
 
 1. `limits` section, except `limits.storage` which should be set to your capacity.
 2. `intervals` section
