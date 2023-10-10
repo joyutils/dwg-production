@@ -32,7 +32,9 @@ Secondly, clone the repo https://github.com/kdembler/dwg-production Follow instr
 
 In your `.env`, provide valid values for `CHAIN_VOLUME`, `DATABASE_VOLUME`, `DISTRIBUTOR_DATA_VOLUME`, `DISTRIBUTOR_CACHE_VOLUME` and `DISTRIBUTOR_LOGS_VOLUME`. Those volumes should point at where you currently keep all the chain/QN/Argus data.
 
-If you used default monorepo setup for QN, your DB data is probably in Docker volume. Assuming it's called `joystream_query-node-data` (default), you can extract it to local ./db directory:
+If you used default monorepo setup for QN, your DB data is most likely created with Postgres@12. In that case, it makes most sense to start fresh and sync. To speed up QN processor sync, use external indexer until your own indexer is synced: `PROCESSOR_INDEXER_GATEWAY=https://mainnet-rpc-1.joystream.org/query-node/indexer/graphql`
+
+If you have a DB created with Postgres@14, it's porbably in Docker container. Assuming it's called `joystream_query-node-data` (default), you can extract it to local ./db directory:
 
 ```sh
 docker run --rm -v joystream_query-node-data:/volume -v $(pwd)/db:/backup alpine tar -czvf /backup/backup.tar.gz -C /volume ./
@@ -51,6 +53,7 @@ Place your current distributor config based on `DISTRIBUTOR_CONFIG_VOLUME`. Upda
 
 1. `limits` section, except `limits.storage` which should be set to your capacity.
 2. `intervals` section
+3. `directories` section
 
 Now start the distributor and you should be done.
 
