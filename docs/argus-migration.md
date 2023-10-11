@@ -6,6 +6,7 @@ First, stop all your current services gracefully.
 # Distributor node
 # if running with service
 systemctl disable distributor-node
+systemctl stop distributor-node
 # if running with docker
 docker compose down distributor
 
@@ -19,6 +20,7 @@ docker compose down db redis
 # Joystream node
 # if running with service
 systemctl disable joystream-node
+systemctl stop joystream-node
 # if running with docker
 docker compose down joystream-node
 
