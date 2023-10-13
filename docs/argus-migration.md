@@ -28,6 +28,8 @@ docker compose down joystream-node
 systemctl disable caddy
 ```
 
+At this point it's best to move any data you had stored in old monorepo. That may include chain data, distributor data, cache and keys. You can move them to any place you like, you will use those paths in the next step.
+
 Secondly, clone the repo https://github.com/kdembler/dwg-production Follow instructions in the README.
 
 In your `.env`, provide valid values for data volumes. Those volumes should point at where you currently keep all the chain/QN/Argus data:
