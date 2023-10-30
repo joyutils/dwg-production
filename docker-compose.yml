@@ -42,7 +42,7 @@ services:
       ]
 
   graphql-server:
-    image: joystream/query-node:1.3.0
+    image: joystream/query-node:1.6.0
     container_name: graphql-server
     restart: unless-stopped
     environment:
@@ -87,7 +87,7 @@ services:
       "
 
   processor:
-    image: joystream/query-node:1.3.0
+    image: joystream/query-node:1.6.0
     container_name: processor
     restart: unless-stopped
     environment:
@@ -286,7 +286,7 @@ services:
     command: ["start"]
 
   storage:
-    image: joystream/storage-node:3.5.0
+    image: joystream/storage-node:3.7.1
     container_name: storage
     restart: unless-stopped
     volumes:
