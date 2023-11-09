@@ -43,10 +43,11 @@ docker compose up -d graphql-server
 A working graphql endpoint should be accessible at http://localhost:8081/graphql
 For additional configuring options for the query node check the [docs](./docs/QUERYNODE.md)
 
-Start monitoring
+Start tracing and monitoring
 
 ```sh
-docker compose up -d prometheus
+docker compose up -d collector
+docker compose up -d metricbeat
 ```
 
 Before going further, you should wait for the processor to fully sync up before using them production for your storage or distributor nodes.

@@ -1,4 +1,4 @@
-id: test-distributor
+# id passed as env variable
 endpoints:
   queryNode: http://graphql-server:8081/graphql
   joystreamNodeWs: ws://joystream-node:9944/
@@ -13,12 +13,8 @@ logs:
     maxSize: 50485760 # 50 MB
   console:
     level: verbose
-  # elastic:
+  # elastic: # elastic endpoint and credentials are passed as env variables
   #   level: http
-  #   endpoint: https://monitoring.joyutils.org/elastic
-  #   auth:
-  #     username: username
-  #     password: password
 limits:
   storage: 500G
   maxConcurrentStorageNodeDownloads: 100

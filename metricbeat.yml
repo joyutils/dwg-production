@@ -1,0 +1,32 @@
+metricbeat.modules:
+  - module: system
+    metricsets:
+      - cpu
+      - load
+      - memory
+      - network
+      - process
+      - process_summary
+      - uptime
+      - socket_summary
+      - diskio
+      - filesystem
+      - fsstat
+    processors:
+      - drop_event.when.regexp:
+          system.network.name: "^(lo|docker0|br-.*|veth.*)$"
+      - drop_event.when.regexp:
+          system.filesystem.mount_point: "^.*run/docker.*$"
+
+  - module: docker
+    metricsets:
+      - "container"
+      - "cpu"
+      - "diskio"
+      - "event"
+      - "healthcheck"
+      - "info"
+      - "memory"
+      - "network"
+    hosts: ["unix:///var/run/docker.sock"]
+    enabled: true

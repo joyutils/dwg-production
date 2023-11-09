@@ -66,7 +66,8 @@ services:
       - TYPEORM_LOGGING=error
       - PROCESSOR_HOST=processor
       - PROCESSOR_STATE_APP_PORT=${PROCESSOR_STATE_APP_PORT}
-      - ENABLE_TELEMETRY=${ENABLE_TELEMETRY:-no}
+      # - ENABLE_TELEMETRY=${ENABLE_TELEMETRY:-no}
+      - ENABLE_TELEMETRY=no # graphql-server generates a lot of traces, disabled for now
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4318
       - OTEL_RESOURCE_ATTRIBUTES=service.name=query-node,deployment.environment=production
       - NODE_ENV=${NODE_ENV}
@@ -178,25 +179,6 @@ services:
     ports:
       - "127.0.0.1:6379:6379"
 
-  jaeger:
-    container_name: jaeger
-    image: jaegertracing/all-in-one:1.47.0
-    restart: unless-stopped
-    volumes:
-      - ./badger:/badger
-    environment:
-      - MEMORY_MAX_TRACES=5000
-      - SPAN_STORAGE_TYPE=badger
-      - BADGER_EPHEMERAL=false
-      - BADGER_DIRECTORY_VALUE=/badger/data
-      - BADGER_DIRECTORY_KEY=/badger/key
-      - BADGER_SPAN_STORE_TTL=48h0m0s
-      - METRICS_STORAGE_TYPE=prometheus
-      - PROMETHEUS_SERVER_URL=http://prometheus:9090
-      - PROMETHEUS_QUERY_SUPPORT_SPANMETRICS_CONNECTOR=true
-    ports:
-      - "127.0.0.1:16686:16686"
-
   collector:
     container_name: collector
     image: otel/opentelemetry-collector-contrib:0.80.0
@@ -208,38 +190,39 @@ services:
       - "127.0.0.1:4317:4317" # OTLP gRPC receiver
       - "127.0.0.1:4318:4318" # OTLP HTTP receiver
     depends_on:
-      - jaeger
-      - prometheus
-
-  prometheus:
-    image: prom/prometheus:v2.45.0
-    container_name: prometheus
-    restart: unless-stopped
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus-data:/prometheus
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--web.enable-lifecycle"
+      - apm-server
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:8.8.0
+    container_name: apm-server
+    command: |
+      --strict.perms=false -e
+      -E output.elasticsearch.hosts=["${ELASTIC_URL}"]
+      -E output.elasticsearch.username=${ELASTIC_USERNAME}
+      -E output.elasticsearch.password=${ELASTIC_PASSWORD}
+      -E output.elasticsearch.ssl.verification_mode=none
     ports:
-      - 127.0.0.1:9090:9090
-    depends_on:
-      - node-exporter
+      - 127.0.0.1:8200:8200
 
-  node-exporter:
-    image: prom/node-exporter:latest
-    container_name: node-exporter
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:8.8.0
+    container_name: metricbeat
+    user: root
+    command: |
+      -e -system.hostfs=/hostfs
+      -E output.elasticsearch.hosts=["${ELASTIC_URL}"]
+      -E output.elasticsearch.username=${ELASTIC_USERNAME}
+      -E output.elasticsearch.password=${ELASTIC_PASSWORD}
+      -E name=${NODE_ID}
+    network_mode: host
+    environment:
+      - DBUS_SYSTEM_BUS_ADDRESS=unix:path=/hostfs/var/run/dbus/system_bus_socket
     volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - "--path.procfs=/host/proc"
-      - "--path.sysfs=/host/sys"
-      - "--path.rootfs=/rootfs"
-      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
-    restart: unless-stopped
+      - /proc:/hostfs/proc:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /:/hostfs:ro
+      - /var/run/dbus/system_bus_socket:/hostfs/var/run/dbus/system_bus_socket:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro
 
   caddy:
     image: caddy:2
@@ -248,7 +231,6 @@ services:
     ports:
       - 80:80 # Needed for the ACME HTTP-01 challenge.
       - 443:443
-      - 2020:2020 # Default port in Caddyfile if CADDY_DOMAIN not set.
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy/config:/config
@@ -261,7 +243,7 @@ services:
       OTEL_SERVICE_NAME: caddy
 
   distributor:
-    image: joystream/distributor-node:1.4.0
+    image: joystream/distributor-node:1.5.0
     container_name: distributor
     restart: unless-stopped
     volumes:
@@ -282,6 +264,10 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4318
       OTEL_RESOURCE_ATTRIBUTES: service.name=argus,deployment.environment=production
       NODE_ENV: production
+      JOYSTREAM_DISTRIBUTOR__ID: ${NODE_ID}
+      JOYSTREAM_DISTRIBUTOR__LOGS__ELASTIC__ENDPOINT: ${ELASTIC_URL}
+      JOYSTREAM_DISTRIBUTOR__LOGS__ELASTIC__AUTH__USERNAME: ${ELASTIC_USERNAME}
+      JOYSTREAM_DISTRIBUTOR__LOGS__ELASTIC__AUTH__PASSWORD: ${ELASTIC_PASSWORD}
     entrypoint: ["/joystream/distributor-node/runner.sh"]
     command: ["start"]
 
@@ -318,9 +304,6 @@ services:
       --logFileChangeFrequency none
       --keyFile /keystore/keyfile.json
       "
-
-volumes:
-  prometheus-data: {}
 
 networks:
   default:

@@ -21,30 +21,6 @@
 	handle_path /query/* {
 		reverse_proxy graphql-server:8081
 	}
-
-	route /prometheus* {
-		uri strip_prefix /prometheus
-
-		@notAllowedIP not remote_ip 65.21.233.125 # monitoring.joyutils.org
-		respond @notAllowedIP 403
-
-		basicauth {
-			monitoring $2a$14$gbe8Y/6JZX6RNmS.GuLIp.Cqey3OLguTx83e0xgaYpyXPOCokAI3W
-		}
-
-		reverse_proxy prometheus:9090
-	}
-
-	# Optionally allow jaeger and prometheus server to monitor remotely. 
-	# Generally not a good idea as traces and metrics may reveal sensitive information.
-	# Prometheus
-	# handle_path /prometheus/* {
-	#	reverse_proxy prometheus:9090
-	#}
-	# Jaeger
-	# handle /* {
-	#     reverse_proxy jaeger:16686
-	# }
 }
 
 # For future configuration when storage-node released that works

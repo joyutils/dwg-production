@@ -3,36 +3,14 @@ receivers:
     protocols:
       grpc:
       http:
-  # hostmetrics:
-  #  https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/hostmetricsreceiver
-  #  https://grafana.com/grafana/dashboards/18682-otel-node/
-
-  jaeger:
-      protocols:
-        thrift_http:
-          endpoint: "0.0.0.0:14278"
 
 exporters:
-  jaeger:
-    endpoint: jaeger:14250
+  # Export to shared ElasticSearch APM service
+  otlphttp/apm:
+    compression: none
+    endpoint: http://apm-server:8200
     tls:
       insecure: true
-
-  prometheus:
-    endpoint: "0.0.0.0:8889"
-
-  # Export to shared ElasticSearch APM service
-  # otlphttp/apm:
-  #     compression: none
-  #     endpoint: http://apm-server:8200
-  #     tls:
-  #       insecure: true
-  #     headers:
-  #       Authorization: Bearer ${ELASTIC_APM_SERVER_TOKEN}
-
-connectors:
-  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector
-  spanmetrics:
 
 processors:
   batch:
@@ -40,15 +18,9 @@ processors:
 service:
   pipelines:
     traces:
-      receivers: [otlp, jaeger]
+      receivers: [otlp]
       processors: [batch]
-      exporters: [jaeger, spanmetrics]
-      # exporters: [otlphttp/apm, jaeger, spanmetrics]
+      exporters: [otlphttp/apm]
     metrics:
       receivers: [otlp]
-      exporters: [prometheus]
-      # exporters: [otlphttp/apm, prometheus]
-    metrics/spanmetrics:
-      receivers: [spanmetrics]
-      exporters: [prometheus]
-
+      exporters: [otlphttp/apm]
