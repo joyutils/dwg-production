@@ -79,13 +79,7 @@ services:
     working_dir: /joystream
     entrypoint: bash
     command: >
-      -c "
-        if [[ "$ENABLE_TELEMETRY" = "yes" ]]; then
-          yarn workspace query-node-root query-node:start:prod:with-instrumentation
-        else
-          yarn workspace query-node-root query-node:start:prod
-        fi
-      "
+      -c "yarn workspace query-node-root query-node:start:prod"
 
   processor:
     image: joystream/query-node:1.6.0
