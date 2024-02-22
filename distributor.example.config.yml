@@ -1,6 +1,6 @@
 # id passed as env variable
 endpoints:
-  queryNode: http://graphql-server:8081/graphql
+  storageSquid: http://squid-graphql-server:4352/graphql
   joystreamNodeWs: ws://joystream-node:9944/
 directories:
   assets: /data

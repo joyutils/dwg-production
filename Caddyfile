@@ -21,6 +21,10 @@
 	handle_path /query/* {
 		reverse_proxy graphql-server:8081
 	}
+
+	handle_path /squid* {
+	  reverse_proxy squid-graphql-server:435
+	}
 }
 
 # For future configuration when storage-node released that works

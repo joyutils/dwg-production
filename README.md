@@ -25,19 +25,12 @@ Start a joystream-node
 docker compose up -d joystream-node
 ```
 
-Start the QueryNode indexing services
+Start the storage squid processor and graphql server
 
 ```sh
-docker compose up -d db
-docker compose up -d indexer
-docker compose up -d hydra-indexer-gateway
-```
-
-Start QueryNode processor and GraphQL frontend
-
-```sh
-docker compose up -d processor
-docker compose up -d graphql-server
+docker compose up -d squid-db
+docker compose up -d squid-processor
+docker compose up -d squid-graphql-server
 ```
 
 A working graphql endpoint should be accessible at http://localhost:8081/graphql
