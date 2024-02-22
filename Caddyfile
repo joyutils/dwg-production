@@ -23,7 +23,7 @@
 	}
 
 	handle_path /squid* {
-	  reverse_proxy squid-graphql-server:435
+	  reverse_proxy squid-graphql-server:4352
 	}
 }
 

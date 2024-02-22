@@ -309,8 +309,6 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
       PGPORT: ${SQUID_DB_PORT}
-    ports:
-      - '127.0.0.1:${SQUID_DB_PORT}:${SQUID_DB_PORT}'
     command: [ 'postgres', '-c', 'config_file=/etc/postgresql/postgresql.conf', '-p', '${SQUID_DB_PORT}' ]
     shm_size: 1.1g # A bit higher than `shared_buffers` value in postgres.conf
     volumes:
@@ -353,7 +351,7 @@ services:
       - squid-db
     command: [ 'npm', 'run', 'graphql-server-start' ]
     ports:
-      - '${SQUID_GQL_PORT}:${SQUID_GQL_PORT}'
+      - '127.0.0.1:${SQUID_GQL_PORT}:${SQUID_GQL_PORT}'
 
 volumes:
   squid-db-data: {}
