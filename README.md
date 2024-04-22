@@ -48,7 +48,7 @@ Before going further, you should wait for the processor to fully sync up before 
 You can track its progress by looking at the logs:
 
 ```sh
-docker logs --tail 100 --follow processor
+docker logs --tail 100 --follow squid-processor
 ```
 
 ### Distributor Node
