@@ -13,8 +13,8 @@ logs:
     maxSize: 50485760 # 50 MB
   console:
     level: verbose
-  # elastic: # elastic endpoint and credentials are passed as env variables
-  #   level: http
+  elastic: # elastic endpoint and credentials are passed as env variables
+    level: http
 limits:
   storage: 500G
   maxConcurrentStorageNodeDownloads: 100
