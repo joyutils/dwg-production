@@ -237,7 +237,7 @@ services:
       OTEL_SERVICE_NAME: caddy
 
   distributor:
-    image: joystream/distributor-node:2.0.0
+    image: joystream/distributor-node:latest
     container_name: distributor
     restart: unless-stopped
     volumes:
